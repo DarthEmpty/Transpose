@@ -3,4 +3,6 @@
 .vscode/
 out/
 node_modules/
+
+.env
 yarn.lock
