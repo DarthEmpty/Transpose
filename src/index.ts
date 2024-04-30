@@ -1,4 +1,4 @@
-import * as dotenv from "dotenv";
+import dotenv from "dotenv";
 import { isAxiosError } from "axios";
 import { SpotifyClient } from "./client.js";
 
