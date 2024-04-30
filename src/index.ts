@@ -1,35 +1,24 @@
 import * as dotenv from "dotenv";
-import axios from "axios";
+import { isAxiosError } from "axios";
+import { SpotifyClient } from "./client.js";
 
-const main = async () => {
-  const config = {
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-  };
-  const data = {
-    grant_type: "client_credentials",
-    client_id: process.env.SPOTIFY_CLIENT_ID,
-    client_secret: process.env.SPOTIFY_CLIENT_SECRET,
-  };
+async function main() {
+  const spotify = new SpotifyClient();
 
-  let res;
   try {
-    res = await axios.post(
-      "https://accounts.spotify.com/api/token",
-      data,
-      config,
-    );
-
+    const res = await spotify.getAccessToken({
+      client_id: process.env.SPOTIFY_CLIENT_ID,
+      client_secret: process.env.SPOTIFY_CLIENT_SECRET,
+    });
     console.log(res.data);
   } catch (error) {
-    if (axios.isAxiosError(error) && error.response)
+    if (isAxiosError(error) && error.response)
       console.error(
         `Error ${error.response.status}: ${error.response.data.error}`,
       );
     else console.error(error);
   }
-};
+}
 
 dotenv.config();
 main();
