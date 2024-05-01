@@ -12,14 +12,14 @@ export abstract class Client {
   }
 
   abstract getAccessToken(data: Object): Promise<AxiosResponse>;
-  abstract readPlaylists(data: Object): void;
-  abstract writePlaylists(data: Object): void;
+  abstract readPlaylists(token: string): Promise<AxiosResponse>;
+  abstract writePlaylists(data: Object): Promise<AxiosResponse>;
 }
 
-const SPOTIFY_API_BASE_URL = "https://api.spotify.com/";
+const SPOTIFY_API_BASE_URL = "https://api.spotify.com/v1";
 const SPOTIFY_ACCESS_TOKEN_URL = "https://accounts.spotify.com/api/token";
 
-interface SpotifyAccessTokenRequestData {
+interface SpotifyTokenRequestData {
   client_id: string;
   client_secret: string;
 }
@@ -29,9 +29,7 @@ export class SpotifyClient extends Client {
     super({ ...config, baseURL: SPOTIFY_API_BASE_URL });
   }
 
-  getAccessToken = (
-    data: SpotifyAccessTokenRequestData,
-  ): Promise<AxiosResponse> =>
+  getAccessToken = (data: SpotifyTokenRequestData): Promise<AxiosResponse> =>
     this.instance.post(
       SPOTIFY_ACCESS_TOKEN_URL,
       { ...data, grant_type: "client_credentials" },
@@ -42,10 +40,16 @@ export class SpotifyClient extends Client {
       },
     );
 
-  readPlaylists(data: Object): void {
-    throw new Error("Method not implemented.");
-  }
-  writePlaylists(data: Object): void {
+  readPlaylists = (token: string): Promise<AxiosResponse> =>
+    // My public playlists
+    // TODO: Make users login to their own accounts to retrieve all playlists
+    this.instance.get("/users/313dxjn2yclpwv5kgitniu6ake2q/playlists", {
+      headers: {
+        Authorization: "Bearer " + token,
+      },
+    });
+
+  writePlaylists(data: Object): Promise<AxiosResponse> {
     throw new Error("Method not implemented.");
   }
 }

@@ -6,15 +6,21 @@ async function main() {
   const spotify = new SpotifyClient();
 
   try {
-    const res = await spotify.getAccessToken({
+    let res = await spotify.getAccessToken({
       client_id: process.env.SPOTIFY_CLIENT_ID,
       client_secret: process.env.SPOTIFY_CLIENT_SECRET,
     });
-    console.log(res.data);
+
+    const token = res.data.access_token;
+
+    res = await spotify.readPlaylists(token);
+
+    console.log(res.data.items.map((item: { name: string }) => item.name));
   } catch (error) {
     if (isAxiosError(error) && error.response)
       console.error(
-        `Error ${error.response.status}: ${error.response.data.error}`,
+        `Axios Error ${error.response.status}: ` +
+          `${error.response.data.error.message}`,
       );
     else console.error(error);
   }
