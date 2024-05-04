@@ -1,21 +1,17 @@
 import dotenv from "dotenv";
 import { isAxiosError } from "axios";
-import { SpotifyClient } from "./client.js";
+import { SpotifyClient } from "./clients/index.js";
 
 async function main() {
   const spotify = new SpotifyClient();
 
   try {
-    let res = await spotify.getAccessToken({
+    await spotify.getAccessToken({
       client_id: process.env.SPOTIFY_CLIENT_ID,
       client_secret: process.env.SPOTIFY_CLIENT_SECRET,
     });
 
-    const token = res.data.access_token;
-
-    res = await spotify.readPlaylists(token);
-
-    console.log(res.data.items.map((item: { name: string }) => item.name));
+    console.log(await spotify.readPlaylists());
   } catch (error) {
     if (isAxiosError(error) && error.response)
       console.error(
