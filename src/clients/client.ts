@@ -16,9 +16,9 @@ export default abstract class Client {
   }
 
   abstract getAccessToken(data: Object): Promise<string>;
-  abstract readPlaylists(token?: string): Promise<[Playlist]>;
-  abstract writePlaylists(
-    data: [Playlist],
+  abstract readUserPlaylists(token?: string): Promise<Playlist[]>;
+  abstract writeUserPlaylists(
+    data: Playlist[],
     token?: string,
   ): Promise<AxiosResponse>;
 }

@@ -1,9 +1,9 @@
 export type Track = {
-  title: string;
-  artist: string;
+  name: string;
+  artists: string[];
 };
 
 export type Playlist = {
-  title: string;
-  tracks: [Track];
+  name: string;
+  tracks: Track[];
 };

@@ -11,7 +11,9 @@ async function main() {
       client_secret: process.env.SPOTIFY_CLIENT_SECRET,
     });
 
-    console.log(await spotify.readPlaylists());
+    const playlists = await spotify.readUserPlaylists();
+
+    console.log(JSON.stringify(playlists[5], null, 2));
   } catch (error) {
     if (isAxiosError(error) && error.response)
       console.error(
