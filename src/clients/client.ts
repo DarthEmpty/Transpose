@@ -4,7 +4,7 @@ import axios, {
   AxiosInstance,
 } from "axios";
 
-import { Playlist } from "../schema.js";
+import type { Playlist } from "../schema.d.ts";
 
 export default abstract class Client {
   protected instance: AxiosInstance;

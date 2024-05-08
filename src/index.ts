@@ -1,3 +1,4 @@
+import { writeFile } from "fs";
 import dotenv from "dotenv";
 import { isAxiosError } from "axios";
 import { SpotifyClient } from "./clients/index.js";
@@ -13,7 +14,10 @@ async function main() {
 
     const playlists = await spotify.readUserPlaylists();
 
-    console.log(JSON.stringify(playlists[5], null, 2));
+    writeFile("music_collection.json", JSON.stringify(playlists), (err) => {
+      if (err) throw err;
+      console.log("Playlists Downloaded");
+    });
   } catch (error) {
     if (isAxiosError(error) && error.response)
       console.error(
