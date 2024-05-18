@@ -82,7 +82,10 @@ export default class SpotifyClient extends Client {
     );
   }
 
-  writeUserPlaylists(data: Playlist[], token?: string): Promise<AxiosResponse> {
+  writeUserPlaylists(
+    data: Playlist[],
+    token?: string,
+  ): Promise<AxiosResponse<any, any>> {
     throw new Error("Method not implemented.");
   }
 }
