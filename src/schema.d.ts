@@ -1,9 +1,9 @@
-export type Track = {
+export interface Track {
   name: string;
   artists: string[];
-};
+}
 
-export type Playlist = {
+export interface Playlist {
   name: string;
   tracks: Track[];
-};
+}

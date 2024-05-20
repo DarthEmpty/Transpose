@@ -1,5 +1,7 @@
-import { CreateAxiosDefaults, AxiosResponse } from "axios";
+import { CreateAxiosDefaults, AxiosResponse, isAxiosError } from "axios";
+import open from "open";
 import Client from "./client.js";
+import { sleep } from "../utils.js";
 import type { Playlist } from "../schema.d.ts";
 
 export default class AmazonMusicClient extends Client {
@@ -10,7 +12,7 @@ export default class AmazonMusicClient extends Client {
   private requestDeviceAuthorization = async (data: {
     client_id: string;
   }): Promise<AxiosResponse> =>
-    await this.instance.post("https://api.amazon.com/auth/o2/create/codepair", {
+    this.instance.post("https://api.amazon.com/auth/o2/create/codepair", {
       ...data,
       scope: "profile",
       response_type: "device_code",
@@ -20,16 +22,44 @@ export default class AmazonMusicClient extends Client {
     device_code: string;
     user_code: string;
   }): Promise<AxiosResponse> =>
-    await this.instance.post("https://api.amazon.com/auth/o2/token", {
+    this.instance.post("https://api.amazon.com/auth/o2/token", {
       ...data,
       grant_type: "device_code",
     });
 
+  private async pollForAccessToken(data: {
+    device_code: string;
+    user_code: string;
+    interval: number;
+    expires_in: number;
+  }): Promise<string> {
+    for (let elapsed = 0; elapsed < data.expires_in; elapsed += data.interval) {
+      try {
+        const res = await this.requestAccessToken(data);
+        return res.data.access_token;
+      } catch (error) {
+        if (
+          !isAxiosError(error) ||
+          !error.response ||
+          error.response.data.error !== "authorization_pending"
+        )
+          throw error;
+
+        await sleep(data.interval * 1000);
+      }
+    }
+
+    return "";
+  }
+
   async getAccessToken(data: { client_id: string }): Promise<string> {
     const deviceAuthRes = await this.requestDeviceAuthorization(data);
-    const accessTokenRes = await this.requestAccessToken(deviceAuthRes.data);
-    console.log(accessTokenRes.data);
-    return "";
+    const codeInfo = deviceAuthRes.data;
+
+    console.log(codeInfo.user_code);
+    open(codeInfo.verification_uri);
+
+    return this.pollForAccessToken(codeInfo);
   }
 
   readUserPlaylists(token?: string): Promise<Playlist[]> {

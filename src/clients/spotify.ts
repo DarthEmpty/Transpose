@@ -11,7 +11,7 @@ export default class SpotifyClient extends Client {
     client_id: string;
     client_secret: string;
   }): Promise<AxiosResponse> =>
-    await this.instance.post(
+    this.instance.post(
       "https://accounts.spotify.com/api/token",
       { ...data, grant_type: "client_credentials" },
       {
@@ -74,7 +74,7 @@ export default class SpotifyClient extends Client {
     const res = await this.requestUserPlaylists(access_token, userID);
     const playlists = res.data.items;
 
-    return await Promise.all<Playlist>(
+    return Promise.all<Playlist>(
       playlists.map(async (playlist: any) => ({
         name: playlist.name,
         tracks: await this.readPlaylistTracks(access_token, playlist.id),
